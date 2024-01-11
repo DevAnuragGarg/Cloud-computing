@@ -355,3 +355,143 @@ DNS
 The Domain Name System (DNS) is the phonebook of the Internet. Humans access information online through domain names, like nytimes.com or espn.com. Web browsers interact through Internet Protocol (IP) addresses. DNS translates domain names to IP addresses so browsers can load Internet resources.
 
 Each device connected to the Internet has a unique IP address which other machines use to find the device. DNS servers eliminate the need for humans to memorize IP addresses such as 192.168.1.1 (in IPv4), or more complex newer alphanumeric IP addresses such as 2400:cb00:2048:1::c629:d7a2 (in IPv6).
+
+
+=========================
+Multi-Region Application
+=========================
+AWS Regions are built with multiple isolated and physically separate Availability Zones (AZs). This approach allows you to create highly available Well-Architected workloads that span AZs to achieve greater fault tolerance. This satisfies the availability goals for most applications, but there are some general reasons that you may be thinking about expanding beyond a single Region:
+
+Expansion to a global audience as an application grows and its user base becomes more geographically dispersed, there can be a need to reduce latencies for different parts of the world.
+Reducing Recovery Point Objectives (RPO) and Recovery Time Objectives (RTO) as part of a multi-Region disaster recovery (DR) plan.
+Local laws and regulations may have strict data residency and privacy requirements that must be followed.
+
+========= 
+Security: Creating a security foundation starts with setting proper authentication and authorization rules. The system handling these requests must be highly resilient to verify and authorize requests quickly and reliably. AWS Identity and Access Management (IAM) accomplishes this by creating a reliable mechanism for you to manage access to AWS services and resources. IAM has multi-Region availability automatically, with no configuration required on your part.
+
+Applications that need to securely store, rotate, and audit secrets, such as database passwords, should use AWS Secrets Manager. This service encrypts secrets with AWS Key Management Service (AWS KMS) keys and can replicate secrets to secondary Regions to ensure applications are able to quickly retrieve a secret in the closest Region.
+
+Encryption accross region: AWS KMS can be used to encrypt data at rest, and is used extensively for encryption across AWS services. By default, keys are confined to a single Region. AWS services such as Amazon Simple Storage Service (Amazon S3) cross-Region replication and Amazon Aurora Global Database (both covered in part 2), simplify the process of encryption and decryption with different keys in each Region. For other parts of your multi-Region application that rely on KMS keys, you can set up AWS KMS multi-Region keys to replicate the key material and key ID to a second Region. This eliminates the need to decrypt and re-encrypt data with a different key in each Region. For example, multi-Region keys can be used to reduce the complexity of a multi-Region application’s encryption operations for data that is stored across Regions.
+
+Auditing and observability across Regions
+It is a best practice to configure AWS CloudTrail to keep a record of all relevant AWS API activity in your account for auditing purposes. When you utilize multiple Regions or accounts, these CloudTrail logs should be aggregated into a single Amazon S3 bucket for easier analysis. To prevent misuse, the centralized logs should be treated with higher severity, with only limited access to key systems and personnel.
+
+Subnet
+When a bigger network is divided into smaller networks, to maintain security, then that is known as Subnetting. So, maintenance is easier for smaller networks. For example, if we consider a class A address, the possible number of hosts is 224 for each network, it is obvious that it is difficult to maintain such a huge number of hosts, but it would be quite easier to maintain if we divide the network into small parts. 
+
+VPC: You can launch AWS resources into a defined virtual network using Amazon Virtual Private Cloud (Amazon VPC). With the advantages of utilizing the scalable infrastructure of AWS, this virtual network closely mimics a conventional network that you would operate in your own data center. /16 user-defined address space maximum (65,536 addresses)
+Subnetes: To reduce traffic, the subnet will divide the big network into smaller, connected networks. Up to /16, 200 user-defined subnets.
+Route Tables: Route Tables are mainly used to Define the protocol for traffic routing between the subnets.
+Network Access Control Lists: Network Access Control Lists (NACL) for VPC serve as a firewall by managing both inbound and outbound rules. There will be a default NACL for each VPC that cannot be deleted.
+Internet Gateway(IGW): The Internet Gateway (IGW) will make it possible to link the resources in the VPC to the Internet.
+Network Address Translation (NAT):  Network Address Translation (NAT) will enable the connection between the private subnet and the internet.
+
+DynamoDB allows users to create databases capable of storing and retrieving any amount of data and comes in handy while serving any amount of traffic. It dynamically manages each customer’s requests and provides high performance by automatically distributing data and traffic over servers. It is a fully managed NoSQL database service that is fast, predictable in terms of performance, and seamlessly scalable. It relieves the user from the administrative burdens of operating and scaling a distributed database as the user doesn’t have to worry about hardware provisioning, patching Softwares, or cluster scaling. It also eliminates the operational burden and complexity involved in protecting sensitive data by providing encryption at REST.
+
+Amazon VPC is made up of various networking components. Here is the list of a few key components of Amazon VPC:
+
+Subnets
+Elastic network interfaces
+Route tables
+Internet gateways
+Elastic IP addresses
+VPC endpoints
+NAT
+VPC peering
+Many different services, such as Gateway, Load Balancer, Subnets, and so on, make up the core architecture of a well-operating VPC. To build an isolated virtual environment, these resources are grouped under a VPC. Along with these services, there are numerous degrees of security checks.	
+
+An Amazon EC2 instance is based on an Amazon Machine Image (AMI). An AMI specifies instance configurations such as the instance’s storage, launch permissions, and device mappings. When a new standard image needs to be created and released, EC2 Image Builder simplifies the building, testing, and deployment of new AMIs. It can also help with copying of AMIs to additional Regions to eliminate needing to manually copy source AMIs to target Regions.
+Although Amazon Elastic Compute Cloud (Amazon EC2) instances and their associated Amazon Elastic Block Store (Amazon EBS) volumes reside in a single AZ, Amazon Data Lifecycle Manager can automate the process of taking and copying EBS snapshots across Regions. This can enhance DR strategies by providing an easy cold backup-and-restore option for EBS volumes. If you need to back up more than just EBS volumes, AWS Backup provides a central place to do this across multiple services
+
+Microservice-based applications that use containers benefit from quicker start-up times. Amazon Elastic Container Registry (Amazon ECR) can help ensure this happens consistently across Regions with private image replication at the registry level. An ECR private registry can be configured for either cross-Region or cross-account replication to ensure your images are ready in secondary Regions when needed.
+
+
+AWS Storage Services: AWS offers a wide range of storage services that can be provisioned depending on your project requirements and use case. AWS storage services have different provisions for highly confidential data, frequently accessed data, and the not so frequently accessed data. You can choose from various storage types namely, object storage, file storage, block storage services, backups,, and data migration options. All of which fall under the AWS Storage Services list.
+
+Elastic Block Storage (EBS): From the aforementioned list, EBS is a block type durable and persistent storage that can be attached to EC2-instances for additional storage. Unlike EC-2 instance storage volumes which are suitable for holding temporary data EBS volumes are highly suitable for essential and long term data. EBS volumes are specific to availability zones and can only be attached to instances within the same availability zone. 
+EBS can be created from the EC2 dashboard in the console as well as in Step 4 of the EC2 launch. Just note that when creating EBS with EC2, the EBS volumes are created in the same availability zone as EC2, however when provisioned independently users can choose the AZ in which EBS is required.
+
+Features of EBS:
+Scalability: EBS volume sizes and features can be scaled as per the needs of the system. This can be done in two ways:
+Take a snapshot of the volume and create a new volume using the Snapshot with new updated features.
+Updating the existing EBS volume from the console.
+Backup: Users can create snapshots of EBS volumes that act as backups.
+Snapshot can be created manually at any point in time or can be scheduled.
+Snapshots are stored on AWS S3 and are charged according to the S3 storage charges.
+Snapshots are incremental in nature.
+New volumes across regions can be created from snapshots.
+Encryption: Encryption can be a basic requirement when it comes to storage. This can be due to the government of regulatory compliance. EBS offers an AWS managed encryption feature.
+Users can enable encryption when creating EBS volumes bu clicking on a checkbox.
+Encryption Keys are managed by the Key Management Service (KMS) provided by AWS.
+Encrypted volumes can only be attached to selected instance types.
+Encryption uses the AES-256 algorithm.
+Snapshots from encrypted volumes are encrypted and similarly, volumes created from snapshots are encrypted.
+Charges: Unlike AWS S3, where you are charged for the storage you consume, AWS charges users for the storage you hold. For example if you use 1 GB storage in a 5 GB volume, you’d still be charged for a 5 GB EBS volume.
+EBS charges vary from region to region.
+EBS Volumes are independent of the EC@ they are attached to. The data in an EBS volume will remain unchanged even if the instance is rebooted or terminated.
+Single EBS volume can only be attached to one EC2 instance at a time. However, one EC2 can have more than one EBS volumes attached to it.
+
+
+EBS volumes are specific to availability zones and can only be attached to EC2 in the same availability zone. In case AWS’ availability zone is to go down, access to the EBS volume will be lost.
+Can be used for rapidly changing data that needs good I/Ops.
+As compared to EC-2 instance storage the control over data and flexibility offered by EBS is far greater.
+To provide durability, EBS volumes are replicated in their availability zone but are limited to one availability zone.
+
+
+EBS can be used to store data for database applications in a number of ways. Some examples include:
+
+As a root volume for a database instance: An EBS volume can be used as the root volume for an Amazon EC2 instance running a database application, such as MySQL or PostgreSQL. This allows the database application to store its data on a persistent and highly available storage volume, rather than relying on the ephemeral storage of the EC2 instance.
+As a storage volume for a managed database service: AWS offers several managed database services, such as Amazon RDS and Amazon Aurora, that allow users to easily set up and manage a database without having to worry about the underlying infrastructure. These services allow users to create EBS volumes as the storage for their database, providing persistent and scalable storage for the database data.
+As a storage volume for containerized databases: EBS can also be used as the storage for containerized database applications, such as those deployed using Amazon ECS or Amazon EKS. This allows users to store their database data on a persistent and highly available storage volume, while still taking advantage of the benefits of running their database in a containerized environment.
+Drawbacks:
+
+EBS is not recommended as temporary storage.
+They cannot be used as a multi-instance accessed storage as they cannot be shared between instances.
+The durability offered by services like AWS S3 and AWS EFS is greater.
+
+
+Data replication across the AWS network happens quickly, but keep in mind that a networking packet’s travel time will increase as the physical distance the packet needs to travel increases. For this reason, data consistency must be considered against performance when building multi-Region applications.
+
+When building a distributed system, the consistency, availability, and partition tolerance (CAP) theorem must be considered. This theorem states that an application can only pick 2 out of the 3, and tradeoffs should be considered when making this decision.
+
+Consistency – all clients always have the same view of the data
+Availability – all clients can always read and write the data
+Partition Tolerance – the system will continue to work despite physical partitions
+CAP diagram
+
+Achieving consistency and availability (CA) is common for single-Region architectures. For example, when an application connects to a single in-Region relational database. However, this becomes more difficult with multi-Region applications due to the latency added by transferring data over long distances. For this reason, highly distributed systems typically compromise on strict consistency, favoring availability and partition tolerance (AP). This is commonly referred to as an eventual consistency data model.
+
+The scale, durability, and availability of Amazon Simple Storage Service (Amazon S3) make it an excellent destination to store various assets for your application. To enable quick access of this data to your application regardless of the Region it’s deployed in, you can set up Amazon S3 to replicate data across AWS Regions with one-way or two-way continuous replication. If your application doesn’t require all of the objects in a bucket for optimal functionality, a subset of objects can be replicated with Amazon S3 replication rules. Amazon S3 within a Region offers strong read-after-write consistency; however, replicated objects will be eventually consistent in destination Regions. If maintaining low replication lag is critical, S3 Replication Time Control will replicate 99.99% of objects within 15 minutes, and most within seconds. Observability is critical at all layers of an application, and you can watch over the replication status of objects with Amazon S3 events and metrics.
+
+To simplify connecting to and managing multiple bucket endpoints, Amazon S3 Multi-Region Access Points create a single global endpoint that spans multiple S3 buckets in different Regions. When applications connect to this endpoint, requests will route over the AWS network using AWS Global Accelerator to the bucket with the lowest latency. Failover routing is also handled automatically if the availability of a bucket changes.
+
+
+
+How Does EFS Work?
+EFS can be created using the EC2-Instance where it will be created in a specific region and distributed across multiple availability zones for the purpose of high availability and durability. You can choose the EFS based on the I/Ops you are going to perform.
+
+
+Use Cases Of EFS
+Secured file sharing: You can share your files in every secured manner and in a faster and easier way and also ensures consistency across the system.
+Web Hosting: Well suited for web servers where multiple web servers can access the file system and can store the data EFS also scales whenever the data incoming is increased.
+Modernize application development: You can share the data from the AWS resources like ECS, EKS, and any serverless web applications in an efficient manner and without more management required.
+Machine Learning and AI Workloads: EFS is well suited for large data AI applications where multiple instances and containers will access the same data improving collaboration and reducing data duplication.
+Above are some of the use cases of AWS EFS widely used for handling larger datasets type applications.
+
+
+
+Amazon DynamoDB global tables provide multi-Region and multi-writer capabilities to help you build global applications at scale. A DynamoDB global table is the only AWS managed database offering that allows for multiple active writers with conflict detection in a multi-Region topology (active-active and multi-Region). This allows for applications to read and write in the Region closest to them, with changes automatically replicated to other Regions.
+
+
+
+Keeping in-memory caches warm with the same data across Regions can be critical to maintain application performance. Amazon ElastiCache for Redis offers global datastore to create a fully managed, fast, reliable, and secure cross-Region replica for Redis caches and databases. With global datastore, writes occurring in one Region can be read from up to two other cross-Region replica clusters – eliminating the need to write to multiple caches to keep them warm.
+
+
+
+
+For applications that require a relational data model, Amazon Aurora global database provides for scaling of database reads across Regions in Aurora PostgreSQL-compatible and MySQL-compatible editions. Dedicated replication infrastructure utilizes physical storage-based replication to achieve consistently low replication lag that outperforms the built-in logical replication database engines offer, as shown in Figure 2.
+
+
+With Aurora global database, a cluster in one Region is designated as the writer, and secondary Regions are dedicated to reads. While only one instance can process writes, Aurora MySQL supports write forwarding, a feature that will forward write queries from a secondary Region endpoint to the primary Region to simplify logic in application code.
+
+
